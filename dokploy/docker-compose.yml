@@ -2,7 +2,7 @@ services:
   calcom:
     image: calcom-b2bscaler:latest
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_WEBAPP_URL: https://cal.b2bscaler.com
@@ -12,45 +12,33 @@ services:
 
     restart: always
 
-    # keep your icon copy script here if you still need it
     command:
       - sh
       - -c
       - |
           set -e
           copy_app_store() {
-            DEST="$1"
-            mkdir -p "$DEST/app-store" || return 0
+            DEST="$$1"
+            mkdir -p "$$DEST/app-store" || return 0
             for APP_DIR in /calcom/packages/app-store/*; do
-              SLUG="$(basename "$APP_DIR")"
-              [ -d "$APP_DIR/static" ] || continue
-              rm -rf "$DEST/app-store/$SLUG" 2>/dev/null || true
-              mkdir -p "$DEST/app-store/$SLUG" || continue
-              cp -r "$APP_DIR/static/." "$DEST/app-store/$SLUG/" 2>/dev/null || true
+              SLUG="$$(basename "$$APP_DIR")"
+              [ -d "$$APP_DIR/static" ] || continue
+              rm -rf "$$DEST/app-store/$$SLUG" 2>/dev/null || true
+              mkdir -p "$$DEST/app-store/$$SLUG" || continue
+              cp -r "$$APP_DIR/static/." "$$DEST/app-store/$$SLUG/" 2>/dev/null || true
             done
           }
           copy_app_store /calcom/apps/web/public || true
           yarn start
 
-services:
-  calcom:
-    build:
-      context: ..
-      dockerfile: Dockerfile
-
     environment:
       NODE_ENV: production
-      # Set these at runtime too (emails/links):
       NEXT_PUBLIC_WEBAPP_URL: https://cal.b2bscaler.com
       NEXT_PUBLIC_WEBSITE_URL: https://cal.b2bscaler.com
       NEXTAUTH_URL: https://cal.b2bscaler.com
       WEBAPP_URL: https://cal.b2bscaler.com
+      # (keep the rest in Dokploy env UI: DB, secrets, email, etc.)
 
-      # Everything else (DB/secrets/email keys) set in Dokploy UI:
-      # DATABASE_URL: ...
-      # DATABASE_DIRECT_URL: ...
-      # NEXTAUTH_SECRET: ...
-      # CALENDSO_ENCRYPTION_KEY: ...
-      # GOOGLE_CLIENT_ID: ...
-      # GOOGLE_CLIENT_SECRET: ...
-      # etc.
+networks:
+  dokploy-network:
+    external: true
