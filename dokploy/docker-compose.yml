@@ -40,6 +40,7 @@ services:
       NEXT_PUBLIC_WEBSITE_URL: "${NEXT_PUBLIC_WEBSITE_URL}"
       NEXTAUTH_URL: "${NEXTAUTH_URL}"
       WEBAPP_URL: "${WEBAPP_URL}"
+      NEXTAUTH_URL_INTERNAL: "${NEXTAUTH_URL_INTERNAL}"
 
 networks:
   dokploy-network:
