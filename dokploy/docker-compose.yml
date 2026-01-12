@@ -32,6 +32,12 @@ services:
           copy_app_store /calcom/apps/web/public || true
           yarn start
 
+services:
+  calcom:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+
     environment:
       NODE_ENV: production
       # Set these at runtime too (emails/links):
