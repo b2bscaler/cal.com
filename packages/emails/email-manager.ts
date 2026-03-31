@@ -117,6 +117,25 @@ const _sendScheduledEmailsAndSMS = async (
   const formattedCalEvent = formatCalEvent(calEvent);
   const emailsToSend: Promise<unknown>[] = [];
   const organizationSettings = await fetchOrganizationEmailSettings(calEvent.organizationId);
+  const skipAttendeeConfirmation = shouldSkipAttendeeEmailWithSettings(
+    eventTypeMetadata,
+    organizationSettings,
+    EmailType.CONFIRMATION
+  );
+
+  logger.info(
+    "SEND_SCHEDULED_EMAILS_AND_SMS start",
+    safeStringify({
+      bookingUid: calEvent.uid,
+      organizerEmail: formattedCalEvent.organizer.email,
+      attendeeEmails: formattedCalEvent.attendees.map((attendee) => attendee.email),
+      hostEmailDisabled: !!hostEmailDisabled,
+      attendeeEmailDisabled: !!attendeeEmailDisabled,
+      eventTypeDisableHostEmail: eventTypeDisableHostEmail(eventTypeMetadata),
+      skipAttendeeConfirmation,
+      organizationId: calEvent.organizationId,
+    })
+  );
 
   if (!hostEmailDisabled && !eventTypeDisableHostEmail(eventTypeMetadata)) {
     emailsToSend.push(sendEmail(() => new OrganizerScheduledEmail({ calEvent: formattedCalEvent })));
@@ -132,7 +151,7 @@ const _sendScheduledEmailsAndSMS = async (
 
   if (
     !attendeeEmailDisabled &&
-    !shouldSkipAttendeeEmailWithSettings(eventTypeMetadata, organizationSettings, EmailType.CONFIRMATION)
+    !skipAttendeeConfirmation
   ) {
     emailsToSend.push(
       ...formattedCalEvent.attendees.map((attendee) => {
@@ -153,7 +172,21 @@ const _sendScheduledEmailsAndSMS = async (
     );
   }
 
+  logger.info(
+    "SEND_SCHEDULED_EMAILS_AND_SMS prepared",
+    safeStringify({
+      bookingUid: calEvent.uid,
+      emailJobs: emailsToSend.length,
+    })
+  );
   await Promise.all(emailsToSend);
+  logger.info(
+    "SEND_SCHEDULED_EMAILS_AND_SMS sent",
+    safeStringify({
+      bookingUid: calEvent.uid,
+      emailJobs: emailsToSend.length,
+    })
+  );
   const successfullyScheduledSms = new EventSuccessfullyScheduledSMS(calEvent);
   await successfullyScheduledSms.sendSMSToAttendees();
 };

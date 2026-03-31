@@ -2358,6 +2358,19 @@ async function handler(
       }
       if (!noEmail) {
         if (!isDryRun && !(eventType.seatsPerTimeSlot && rescheduleUid)) {
+          tracingLogger.info(
+            "BOOKING_CONFIRMED_EMAIL_FLOW entering",
+            safeStringify({
+              bookingId: booking.id,
+              bookingUid: booking.uid,
+              eventTypeId: eventType.id,
+              isConfirmedByDefault,
+              noEmail,
+              attendeeEmails: evt.attendees.map((attendee) => attendee.email),
+              organizerEmail: evt.organizer.email,
+              workflowsCount: workflows.length,
+            })
+          );
           await emailsAndSmsHandler.send({
             action: BookingActionMap.confirmed,
             data: {
@@ -2373,6 +2386,13 @@ async function handler(
               customInputs,
             },
           });
+          tracingLogger.info(
+            "BOOKING_CONFIRMED_EMAIL_FLOW completed",
+            safeStringify({
+              bookingId: booking.id,
+              bookingUid: booking.uid,
+            })
+          );
           bookingEmailsAndSmsTaskerAction = BookingActionMap.confirmed;
         }
       }
