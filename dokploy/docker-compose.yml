@@ -44,6 +44,10 @@ services:
       NEXTAUTH_URL: "${NEXTAUTH_URL}"
       WEBAPP_URL: "${WEBAPP_URL}"
       NEXTAUTH_URL_INTERNAL: "${NEXTAUTH_URL_INTERNAL}"
+      ALLOWED_HOSTNAMES: '"b2bscaler.com"'
+      EMAIL_FROM: "${EMAIL_FROM}"
+      EMAIL_FROM_NAME: "${EMAIL_FROM_NAME}"
+      RESEND_API_KEY: "${RESEND_API_KEY}"
 
     networks:
       - dokploy-network
