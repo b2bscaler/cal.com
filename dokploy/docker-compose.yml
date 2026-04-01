@@ -17,7 +17,7 @@ services:
       INFISICAL_ENV: "${INFISICAL_ENV}"
       INFISICAL_SECRET_PATH: "/calcom"
     volumes:
-      - ./dokploy/infisical-bootstrap.sh:/opt/dokploy/infisical-bootstrap.sh:ro
+      - ./infisical-bootstrap.sh:/opt/dokploy/infisical-bootstrap.sh:ro
     command: ["/bin/sh", "/opt/dokploy/infisical-bootstrap.sh"]
     networks:
       - dokploy-network
