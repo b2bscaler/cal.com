@@ -181,7 +181,7 @@ export default function JoinCall(props: PageProps) {
       <div style={{ zIndex: 2, position: "relative" }}>
         {showVideoLogo && (
           <img
-            className="fixed z-10 hidden h-8 w-auto max-w-40 object-contain sm:inline-block"
+            className="fixed z-10 hidden h-10 w-auto max-w-48 object-contain sm:inline-block"
             src={calVideoLogo ?? "https://b2bscaler.com/images/logos/b2b-scaler-logo-white.svg"}
             alt="B2B Scaler"
             onError={() => setShowVideoLogo(false)}
