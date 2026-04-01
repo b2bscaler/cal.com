@@ -192,13 +192,13 @@ export default function JoinCall(props: PageProps) {
           />
         ) : (
           <img
-            className="fixed z-10 hidden h-5 sm:inline-block"
+            className="fixed z-10 hidden h-8 sm:inline-block"
             src="https://b2bscaler.com/images/logos/b2b-scaler-logo-white.svg"
             alt="B2B Scaler"
             onError={() => setShowVideoLogo(false)}
             style={{
-              top: 47,
-              left: 20,
+              top: 40,
+              left: 24,
             }}
           />
         ))}
