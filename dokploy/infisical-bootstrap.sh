@@ -96,17 +96,7 @@ rm -f /tmp/infisical-bootstrap.mjs
 . /tmp/infisical_env
 rm -f /tmp/infisical_env
 
-# Cal.com expects ALLOWED_HOSTNAMES to be a quoted JSON fragment, but Dokploy/UI
-# and secret stores may normalize away the quotes. Make plain hostnames safe.
-if [ -n "${ALLOWED_HOSTNAMES:-}" ]; then
-  case "$ALLOWED_HOSTNAMES" in
-    \"*\"|\'*\')
-      ;;
-    *)
-      export ALLOWED_HOSTNAMES="\"$ALLOWED_HOSTNAMES\""
-      ;;
-  esac
-fi
+export ALLOWED_HOSTNAMES='"cal.b2bscaler.com"'
 
 : "${DATABASE_URL:?DATABASE_URL is required from Infisical}"
 : "${NEXTAUTH_SECRET:?NEXTAUTH_SECRET is required from Infisical}"
