@@ -179,21 +179,10 @@ export default function JoinCall(props: PageProps) {
         </div>
       )}
       <div style={{ zIndex: 2, position: "relative" }}>
-        {showVideoLogo && (calVideoLogo ? (
+        {showVideoLogo && (
           <img
-            className="fixed z-10 hidden aspect-square h-16 min-h-16 w-16 min-w-16 rounded-full sm:inline-block"
-            src={calVideoLogo}
-            alt="My Org Logo"
-            onError={() => setShowVideoLogo(false)}
-            style={{
-              top: 32,
-              left: 32,
-            }}
-          />
-        ) : (
-          <img
-            className="fixed z-10 hidden h-8 sm:inline-block"
-            src="https://b2bscaler.com/images/logos/b2b-scaler-logo-white.svg"
+            className="fixed z-10 hidden h-8 w-auto max-w-40 object-contain sm:inline-block"
+            src={calVideoLogo ?? "https://b2bscaler.com/images/logos/b2b-scaler-logo-white.svg"}
             alt="B2B Scaler"
             onError={() => setShowVideoLogo(false)}
             style={{
@@ -201,7 +190,7 @@ export default function JoinCall(props: PageProps) {
               left: 24,
             }}
           />
-        ))}
+        )}
       </div>
       {!hideLoginModal && (
         <LogInOverlay
