@@ -5,7 +5,6 @@ import {
   RECORDING_DEFAULT_ICON,
   TRANSCRIPTION_STOPPED_ICON,
   WEBAPP_URL,
-  WEBSITE_URL,
 } from "@calcom/lib/constants";
 import { formatToLocalizedDate, formatToLocalizedTime } from "@calcom/lib/dayjs";
 import { emailRegex } from "@calcom/lib/emailSchema";
@@ -46,6 +45,7 @@ export default function JoinCall(props: PageProps) {
     isLoggedInUserPartOfMeeting,
   } = props;
   const [daily, setDaily] = useState<DailyCall | null>(null);
+  const [showVideoLogo, setShowVideoLogo] = useState(true);
   const [guestCredentials, setGuestCredentials] = useState<{
     meetingPassword: string;
     meetingUrl: string;
@@ -179,11 +179,12 @@ export default function JoinCall(props: PageProps) {
         </div>
       )}
       <div style={{ zIndex: 2, position: "relative" }}>
-        {calVideoLogo ? (
+        {showVideoLogo && (calVideoLogo ? (
           <img
             className="fixed z-10 hidden aspect-square h-16 min-h-16 w-16 min-w-16 rounded-full sm:inline-block"
             src={calVideoLogo}
             alt="My Org Logo"
+            onError={() => setShowVideoLogo(false)}
             style={{
               top: 32,
               left: 32,
@@ -192,14 +193,15 @@ export default function JoinCall(props: PageProps) {
         ) : (
           <img
             className="fixed z-10 hidden h-5 sm:inline-block"
-            src={`${WEBSITE_URL}/cal-logo-word-dark.svg`}
-            alt="Logo"
+            src="https://b2bscaler.com/images/logos/b2b-scaler-logo-white.svg"
+            alt="B2B Scaler"
+            onError={() => setShowVideoLogo(false)}
             style={{
               top: 47,
               left: 20,
             }}
           />
-        )}
+        ))}
       </div>
       {!hideLoginModal && (
         <LogInOverlay
