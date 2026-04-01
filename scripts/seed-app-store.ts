@@ -106,22 +106,40 @@ export default async function main() {
     });
   }
   await createApp("caldav-calendar", "caldavcalendar", ["calendar"], "caldav_calendar");
-  try {
-    const { client_secret, client_id, redirect_uris } = JSON.parse(
-      process.env.GOOGLE_API_CREDENTIALS || ""
-    ).web;
-    await createApp("google-calendar", "googlecalendar", ["calendar"], "google_calendar", {
-      client_id,
-      client_secret,
-      redirect_uris,
-    });
-    await createApp("google-meet", "googlevideo", ["conferencing"], "google_video", {
-      client_id,
-      client_secret,
-      redirect_uris,
-    });
-  } catch (e) {
-    if (e instanceof Error) console.error("Error adding google credentials to DB:", e.message);
+  const googleApiCredentials = process.env.GOOGLE_API_CREDENTIALS?.trim();
+  if (googleApiCredentials) {
+    try {
+      const parsedCredentials = JSON.parse(googleApiCredentials) as {
+        web?: { client_secret?: string; client_id?: string; redirect_uris?: string[] };
+      };
+      const webCredentials = parsedCredentials.web;
+
+      if (
+        webCredentials?.client_id &&
+        webCredentials.client_secret &&
+        Array.isArray(webCredentials.redirect_uris)
+      ) {
+        const { client_secret, client_id, redirect_uris } = webCredentials;
+        await createApp("google-calendar", "googlecalendar", ["calendar"], "google_calendar", {
+          client_id,
+          client_secret,
+          redirect_uris,
+        });
+        await createApp("google-meet", "googlevideo", ["conferencing"], "google_video", {
+          client_id,
+          client_secret,
+          redirect_uris,
+        });
+      } else {
+        console.warn(
+          "Skipping Google app credentials seeding: GOOGLE_API_CREDENTIALS is missing required web fields."
+        );
+      }
+    } catch (e) {
+      if (e instanceof Error) {
+        console.warn("Skipping Google app credentials seeding:", e.message);
+      }
+    }
   }
   if (process.env.MS_GRAPH_CLIENT_ID && process.env.MS_GRAPH_CLIENT_SECRET) {
     await createApp("office365-calendar", "office365calendar", ["calendar"], "office365_calendar", {
