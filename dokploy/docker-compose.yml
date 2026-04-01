@@ -22,6 +22,8 @@ services:
       EMAIL_FROM: "${EMAIL_FROM}"
       EMAIL_FROM_NAME: "${EMAIL_FROM_NAME}"
       RESEND_API_KEY: "${RESEND_API_KEY}"
+      DAILY_API_KEY: "${DAILY_API_KEY}"
+      DAILY_VIDEO_API_KEY: "${DAILY_VIDEO_API_KEY}"
 
     networks:
       - dokploy-network
