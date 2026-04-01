@@ -1,6 +1,8 @@
 services:
   calcom:
-    image: ghcr.io/b2bscaler/cal.com:main
+    build:
+      context: ..
+      dockerfile: Dockerfile
     restart: always
     expose:
       - "3000"
