@@ -20,29 +20,29 @@ services:
       - /bin/sh
       - -ec
       - |
-        : "${INFISICAL_CLIENT_ID:?INFISICAL_CLIENT_ID is required}"
-        : "${INFISICAL_CLIENT_SECRET:?INFISICAL_CLIENT_SECRET is required}"
-        : "${INFISICAL_PROJECT_ID:?INFISICAL_PROJECT_ID is required}"
-        : "${INFISICAL_API_URL:?INFISICAL_API_URL is required}"
-        : "${INFISICAL_ENV:?INFISICAL_ENV is required}"
+        : "$${INFISICAL_CLIENT_ID:?INFISICAL_CLIENT_ID is required}"
+        : "$${INFISICAL_CLIENT_SECRET:?INFISICAL_CLIENT_SECRET is required}"
+        : "$${INFISICAL_PROJECT_ID:?INFISICAL_PROJECT_ID is required}"
+        : "$${INFISICAL_API_URL:?INFISICAL_API_URL is required}"
+        : "$${INFISICAL_ENV:?INFISICAL_ENV is required}"
 
-        AUTH_PAYLOAD=$(node -e 'process.stdout.write(JSON.stringify({clientId: process.env.INFISICAL_CLIENT_ID, clientSecret: process.env.INFISICAL_CLIENT_SECRET}))')
-        TOKEN_RESPONSE=$(wget -q -O - --header="Content-Type: application/json" --post-data="$AUTH_PAYLOAD" "$INFISICAL_API_URL/v1/auth/universal-auth/login")
-        ACCESS_TOKEN=$(printf '%s' "$TOKEN_RESPONSE" | node -e 'let data="";process.stdin.on("data",(chunk)=>(data+=chunk));process.stdin.on("end",()=>{const parsed=JSON.parse(data);process.stdout.write(parsed.accessToken||"");});')
+        AUTH_PAYLOAD=$$(node -e 'process.stdout.write(JSON.stringify({clientId: process.env.INFISICAL_CLIENT_ID, clientSecret: process.env.INFISICAL_CLIENT_SECRET}))')
+        TOKEN_RESPONSE=$$(wget -q -O - --header="Content-Type: application/json" --post-data="$$AUTH_PAYLOAD" "$$INFISICAL_API_URL/v1/auth/universal-auth/login")
+        ACCESS_TOKEN=$$(printf '%s' "$$TOKEN_RESPONSE" | node -e 'let data="";process.stdin.on("data",(chunk)=>(data+=chunk));process.stdin.on("end",()=>{const parsed=JSON.parse(data);process.stdout.write(parsed.accessToken||"");});')
 
-        [ -n "$ACCESS_TOKEN" ] || { echo "ERROR: Failed to get Infisical access token"; echo "$TOKEN_RESPONSE"; exit 1; }
+        [ -n "$$ACCESS_TOKEN" ] || { echo "ERROR: Failed to get Infisical access token"; echo "$$TOKEN_RESPONSE"; exit 1; }
 
-        SECRETS_RESPONSE=$(wget -q -O - --header="Authorization: Bearer $ACCESS_TOKEN" "$INFISICAL_API_URL/v3/secrets/raw?environment=$INFISICAL_ENV&workspaceId=$INFISICAL_PROJECT_ID&expand=true&secretPath=$INFISICAL_SECRET_PATH")
+        SECRETS_RESPONSE=$$(wget -q -O - --header="Authorization: Bearer $$ACCESS_TOKEN" "$$INFISICAL_API_URL/v3/secrets/raw?environment=$$INFISICAL_ENV&workspaceId=$$INFISICAL_PROJECT_ID&expand=true&secretPath=$$INFISICAL_SECRET_PATH")
 
-        printf '%s' "$SECRETS_RESPONSE" | node -e 'const fs=require("fs");let data="";process.stdin.on("data",(chunk)=>(data+=chunk));process.stdin.on("end",()=>{const parsed=JSON.parse(data);const secrets=Array.isArray(parsed)?parsed:(parsed.secrets||[]);if(!secrets.length){console.error("ERROR: Infisical returned 0 secrets");process.exit(1);}const lines=[];for(const secret of secrets){if(!secret||typeof secret!=="object") continue;const key=secret.secretKey;const value=secret.secretValue;if(!key||value===undefined||value===null) continue;const safe=String(value).replace(/'\''/g,"'\"'\"'");lines.push(`export ${key}='\''${safe}'\''`);}fs.writeFileSync("/tmp/infisical_env",lines.join("\n")+"\n");});'
+        printf '%s' "$$SECRETS_RESPONSE" | node -e 'const fs=require("fs");let data="";process.stdin.on("data",(chunk)=>(data+=chunk));process.stdin.on("end",()=>{const parsed=JSON.parse(data);const secrets=Array.isArray(parsed)?parsed:(parsed.secrets||[]);if(!secrets.length){console.error("ERROR: Infisical returned 0 secrets");process.exit(1);}const lines=[];for(const secret of secrets){if(!secret||typeof secret!=="object") continue;const key=secret.secretKey;const value=secret.secretValue;if(!key||value===undefined||value===null) continue;const safe=String(value).replace(/'\''/g,"'\"'\"'");lines.push(`export $${key}='\''$${safe}'\''`);}fs.writeFileSync("/tmp/infisical_env",lines.join("\n")+"\n");});'
 
         . /tmp/infisical_env
         rm -f /tmp/infisical_env
 
-        : "${DATABASE_URL:?DATABASE_URL is required from Infisical}"
-        : "${NEXTAUTH_SECRET:?NEXTAUTH_SECRET is required from Infisical}"
-        : "${CALENDSO_ENCRYPTION_KEY:?CALENDSO_ENCRYPTION_KEY is required from Infisical}"
-        : "${NEXT_PUBLIC_WEBAPP_URL:?NEXT_PUBLIC_WEBAPP_URL is required from Infisical}"
+        : "$${DATABASE_URL:?DATABASE_URL is required from Infisical}"
+        : "$${NEXTAUTH_SECRET:?NEXTAUTH_SECRET is required from Infisical}"
+        : "$${CALENDSO_ENCRYPTION_KEY:?CALENDSO_ENCRYPTION_KEY is required from Infisical}"
+        : "$${NEXT_PUBLIC_WEBAPP_URL:?NEXT_PUBLIC_WEBAPP_URL is required from Infisical}"
 
         exec /calcom/scripts/start.sh
     networks:
