@@ -6,6 +6,7 @@ services:
       - "3000"
     environment:
       NODE_ENV: "production"
+      ALLOWED_HOSTNAMES: '"cal.b2bscaler.com"'
       NEXT_PUBLIC_APP_NAME: "B2B Scaler"
       NEXT_PUBLIC_SUPPORT_MAIL_ADDRESS: "info@b2bscaler.com"
       NEXT_PUBLIC_COMPANY_NAME: "B2B Scaler"
