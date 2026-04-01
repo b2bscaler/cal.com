@@ -123,20 +123,6 @@ const _sendScheduledEmailsAndSMS = async (
     EmailType.CONFIRMATION
   );
 
-  logger.info(
-    "SEND_SCHEDULED_EMAILS_AND_SMS start",
-    safeStringify({
-      bookingUid: calEvent.uid,
-      organizerEmail: formattedCalEvent.organizer.email,
-      attendeeEmails: formattedCalEvent.attendees.map((attendee) => attendee.email),
-      hostEmailDisabled: !!hostEmailDisabled,
-      attendeeEmailDisabled: !!attendeeEmailDisabled,
-      eventTypeDisableHostEmail: eventTypeDisableHostEmail(eventTypeMetadata),
-      skipAttendeeConfirmation,
-      organizationId: calEvent.organizationId,
-    })
-  );
-
   if (!hostEmailDisabled && !eventTypeDisableHostEmail(eventTypeMetadata)) {
     emailsToSend.push(sendEmail(() => new OrganizerScheduledEmail({ calEvent: formattedCalEvent })));
 
@@ -172,21 +158,7 @@ const _sendScheduledEmailsAndSMS = async (
     );
   }
 
-  logger.info(
-    "SEND_SCHEDULED_EMAILS_AND_SMS prepared",
-    safeStringify({
-      bookingUid: calEvent.uid,
-      emailJobs: emailsToSend.length,
-    })
-  );
   await Promise.all(emailsToSend);
-  logger.info(
-    "SEND_SCHEDULED_EMAILS_AND_SMS sent",
-    safeStringify({
-      bookingUid: calEvent.uid,
-      emailJobs: emailsToSend.length,
-    })
-  );
   const successfullyScheduledSms = new EventSuccessfullyScheduledSMS(calEvent);
   await successfullyScheduledSms.sendSMSToAttendees();
 };

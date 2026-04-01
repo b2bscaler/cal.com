@@ -287,31 +287,12 @@ export class BookingEmailSmsHandler {
     const { sendScheduledEmailsAndSMS } = await import("@calcom/emails/email-manager");
 
     try {
-      this.log.debug(
-        "BOOKING_CONFIRMED_EMAIL_HANDLER sending",
-        safeStringify({
-          attendeeEmails: evt.attendees.map((attendee) => attendee.email),
-          organizerEmail: evt.organizer.email,
-          workflowsCount: workflows.length,
-          isHostConfirmationEmailsDisabled,
-          isAttendeeConfirmationEmailDisabled,
-          metadataDisableAllAttendee: metadata?.disableStandardEmails?.all?.attendee || false,
-          metadataDisableAllHost: metadata?.disableStandardEmails?.all?.host || false,
-        })
-      );
       await sendScheduledEmailsAndSMS(
         { ...evt, additionalInformation, additionalNotes, customInputs },
         eventNameObject,
         isHostConfirmationEmailsDisabled,
         isAttendeeConfirmationEmailDisabled,
         metadata
-      );
-      this.log.debug(
-        "BOOKING_CONFIRMED_EMAIL_HANDLER sent",
-        safeStringify({
-          attendeeEmails: evt.attendees.map((attendee) => attendee.email),
-          organizerEmail: evt.organizer.email,
-        })
       );
     } catch (err) {
       this.log.error("Failed to send scheduled event related emails", err);
