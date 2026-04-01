@@ -1,7 +1,6 @@
 services:
   calcom:
     image: ghcr.io/b2bscaler/cal.com:main
-    pull_policy: always
     restart: always
     expose:
       - "3000"
