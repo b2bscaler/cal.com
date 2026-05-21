@@ -25,14 +25,17 @@ const getICalUID = ({
 }) => {
   if (event?.iCalUID) return event.iCalUID;
 
-  if (defaultToEventUid && event?.uid) return `${event.uid}@${APP_NAME}`;
+  // Sanitize APP_NAME for use in UIDs — spaces are invalid per RFC 5545
+  const appId = APP_NAME.replace(/\s+/g, "-");
 
-  if (uid) return `${uid}@${APP_NAME}`;
+  if (defaultToEventUid && event?.uid) return `${event.uid}@${appId}`;
+
+  if (uid) return `${uid}@${appId}`;
 
   const translator = short();
 
   uid = translator.fromUUID(uuidv4());
-  return `${uid}${attendeeId ? `${attendeeId}` : ""}@${APP_NAME}`;
+  return `${uid}${attendeeId ? `${attendeeId}` : ""}@${appId}`;
 };
 
 export default getICalUID;

@@ -3,8 +3,7 @@ import type { DateArray, ParticipationRole, EventStatus, ParticipationStatus } f
 import { createEvent } from "ics";
 import { RRule } from "rrule";
 
-import { getRichDescription } from "@calcom/lib/CalEventParser";
-import { getVideoCallUrlFromCalEvent } from "@calcom/lib/CalEventParser";
+import { getRichDescription, getVideoCallUrlFromCalEvent, getProviderName } from "@calcom/lib/CalEventParser";
 import { ORGANIZER_EMAIL_EXEMPT_DOMAINS } from "@calcom/lib/constants";
 import { ErrorCode } from "@calcom/lib/errorCodes";
 import { ErrorWithCode } from "@calcom/lib/errors";
@@ -58,7 +57,10 @@ const generateIcsString = ({
   partstat?: ParticipationStatus;
   t?: TFunction;
 }): string | undefined => {
-  const location = getVideoCallUrlFromCalEvent(event) || event.location;
+  const videoUrl = getVideoCallUrlFromCalEvent(event);
+  // Use the provider label in LOCATION to avoid Google Calendar wrapping the URL in a Maps link.
+  // The actual join URL is already in the DESCRIPTION via getRichDescription.
+  const location = videoUrl ? (getProviderName(event.location) || videoUrl) : event.location;
 
   // Taking care of recurrence rule
   let recurrenceRule: string | undefined = undefined;
