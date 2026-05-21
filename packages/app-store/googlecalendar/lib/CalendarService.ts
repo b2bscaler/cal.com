@@ -3,7 +3,7 @@
 import { MeetLocationType } from "@calcom/app-store/constants";
 import { getDestinationCalendarRepository } from "@calcom/features/di/containers/DestinationCalendar";
 import { SelectedCalendarRepository } from "@calcom/features/selectedCalendar/repositories/SelectedCalendarRepository";
-import { getLocation, getRichDescription } from "@calcom/lib/CalEventParser";
+import { getLocation, getProviderName, getRichDescription } from "@calcom/lib/CalEventParser";
 import { ORGANIZER_EMAIL_EXEMPT_DOMAINS } from "@calcom/lib/constants";
 import logger from "@calcom/lib/logger";
 import { safeStringify } from "@calcom/lib/safeStringify";
@@ -207,12 +207,17 @@ class GoogleCalendarService implements Calendar {
     }
 
     if (calEvent.location) {
-      payload["location"] = getLocation({
+      const locationStr = getLocation({
         videoCallData: calEvent.videoCallData,
         additionalInformation: calEvent.additionalInformation,
         location: calEvent.location,
         uid: calEvent.uid,
       });
+      // Use the provider label instead of the raw URL to prevent Google Calendar
+      // from wrapping video links in a Google Maps search URL.
+      payload["location"] = /^https?:\/\//.test(locationStr)
+        ? getProviderName(calEvent.location) || locationStr
+        : locationStr;
     }
 
     if (calEvent.recurringEvent) {
@@ -227,6 +232,12 @@ class GoogleCalendarService implements Calendar {
 
     if (calEvent.conferenceData && calEvent.location === MeetLocationType) {
       payload["conferenceData"] = calEvent.conferenceData;
+    } else if (calEvent.videoCallData?.url && calEvent.location !== MeetLocationType) {
+      payload["conferenceData"] = {
+        entryPoints: [{ entryPointType: "video", uri: calEvent.videoCallData.url, label: "Cal Video" }],
+        conferenceSolution: { name: "Cal Video" },
+        conferenceId: calEvent.uid ?? "cal-video",
+      };
     }
     const calendar = await this.authedCalendar();
     // Find in formattedCalEvent.destinationCalendar the one with the same credentialId
@@ -382,16 +393,25 @@ class GoogleCalendarService implements Calendar {
     };
 
     if (event.location) {
-      payload["location"] = getLocation({
+      const locationStr = getLocation({
         videoCallData: event.videoCallData,
         additionalInformation: event.additionalInformation,
         location: event.location,
         uid: event.uid,
       });
+      payload["location"] = /^https?:\/\//.test(locationStr)
+        ? getProviderName(event.location) || locationStr
+        : locationStr;
     }
 
     if (event.conferenceData && event.location === MeetLocationType) {
       payload["conferenceData"] = event.conferenceData;
+    } else if (event.videoCallData?.url && event.location !== MeetLocationType) {
+      payload["conferenceData"] = {
+        entryPoints: [{ entryPointType: "video", uri: event.videoCallData.url, label: "Cal Video" }],
+        conferenceSolution: { name: "Cal Video" },
+        conferenceId: event.uid ?? "cal-video",
+      };
     }
 
     const calendar = await this.authedCalendar();
