@@ -96,7 +96,7 @@ rm -f /tmp/infisical-bootstrap.mjs
 . /tmp/infisical_env
 rm -f /tmp/infisical_env
 
-export ALLOWED_HOSTNAMES='"cal.b2bscaler.com"'
+export ALLOWED_HOSTNAMES="\"b2bscaler.com\""
 
 : "${DATABASE_URL:?DATABASE_URL is required from Infisical}"
 : "${NEXTAUTH_SECRET:?NEXTAUTH_SECRET is required from Infisical}"
