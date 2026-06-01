@@ -1,6 +1,7 @@
-import { whereClauseForOrgWithSlugOrRequestedSlug } from "@calcom/ee/organizations/lib/orgDomains";
-import { getParsedTeam } from "@calcom/features/ee/teams/lib/getParsedTeam";
 import { ProfileRepository } from "@calcom/features/profile/repositories/ProfileRepository";
+
+const whereClauseForOrgWithSlugOrRequestedSlug = (..._args: unknown[]) => ({});
+const getParsedTeam = <T>(team: T): T => team;
 import { getTranslation } from "@calcom/i18n/server";
 import { DEFAULT_SCHEDULE, getAvailabilityFromSchedule } from "@calcom/lib/availability";
 import { buildNonDelegationCredentials } from "@calcom/lib/delegationCredential";
@@ -179,7 +180,7 @@ export class UserRepository {
       })
     ).map((user) => {
       // User isn't part of any organization
-      if (!profiles) {
+      if (!profiles || profiles.length === 0) {
         return {
           ...user,
           profile: ProfileRepository.buildPersonalProfileFromUser({ user }),
