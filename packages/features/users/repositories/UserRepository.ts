@@ -261,9 +261,7 @@ export class UserRepository {
               ? {
                   organization: whereClauseForOrgWithSlugOrRequestedSlug(orgSlug),
                 }
-              : {
-                  organization: null,
-                }),
+              : {}),
           };
     return { where, profiles };
   }
